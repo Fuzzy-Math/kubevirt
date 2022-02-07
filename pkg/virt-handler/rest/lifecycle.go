@@ -45,13 +45,17 @@ type LifecycleHandler struct {
 	recorder     record.EventRecorder
 	vmiInformer  cache.SharedIndexInformer
 	virtShareDir string
+	pdh          string
+	certChain    string
 }
 
-func NewLifecycleHandler(recorder record.EventRecorder, vmiInformer cache.SharedIndexInformer, virtShareDir string) *LifecycleHandler {
+func NewLifecycleHandler(recorder record.EventRecorder, vmiInformer cache.SharedIndexInformer, virtShareDir, pdh, certChain string) *LifecycleHandler {
 	return &LifecycleHandler{
 		recorder:     recorder,
 		vmiInformer:  vmiInformer,
 		virtShareDir: virtShareDir,
+		pdh:          pdh,
+		certChain:    certChain,
 	}
 }
 
