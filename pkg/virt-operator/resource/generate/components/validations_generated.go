@@ -5624,6 +5624,11 @@ var CRDsValidation map[string]string = map[string]string{
                       properties:
                         sev:
                           description: AMD Secure Encrypted Virtualization (SEV).
+                          properties:
+                            attestation:
+                              description: If specified, run the attestation process
+                                for a vmi.
+                              type: object
                           type: object
                       type: object
                     machine:
@@ -8803,6 +8808,11 @@ var CRDsValidation map[string]string = map[string]string{
               properties:
                 sev:
                   description: AMD Secure Encrypted Virtualization (SEV).
+                  properties:
+                    attestation:
+                      description: If specified, run the attestation process for a
+                        vmi.
+                      type: object
                   type: object
               type: object
             machine:
@@ -10927,6 +10937,11 @@ var CRDsValidation map[string]string = map[string]string{
               properties:
                 sev:
                   description: AMD Secure Encrypted Virtualization (SEV).
+                  properties:
+                    attestation:
+                      description: If specified, run the attestation process for a
+                        vmi.
+                      type: object
                   type: object
               type: object
             machine:
@@ -13042,6 +13057,11 @@ var CRDsValidation map[string]string = map[string]string{
                       properties:
                         sev:
                           description: AMD Secure Encrypted Virtualization (SEV).
+                          properties:
+                            attestation:
+                              description: If specified, run the attestation process
+                                for a vmi.
+                              type: object
                           type: object
                       type: object
                     machine:
@@ -16690,6 +16710,11 @@ var CRDsValidation map[string]string = map[string]string{
                                 sev:
                                   description: AMD Secure Encrypted Virtualization
                                     (SEV).
+                                  properties:
+                                    attestation:
+                                      description: If specified, run the attestation
+                                        process for a vmi.
+                                      type: object
                                   type: object
                               type: object
                             machine:
@@ -20699,6 +20724,11 @@ var CRDsValidation map[string]string = map[string]string{
                                     sev:
                                       description: AMD Secure Encrypted Virtualization
                                         (SEV).
+                                      properties:
+                                        attestation:
+                                          description: If specified, run the attestation
+                                            process for a vmi.
+                                          type: object
                                       type: object
                                   type: object
                                 machine:
