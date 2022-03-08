@@ -42,6 +42,7 @@ const (
 
 	VMInstancesSEVFetchCertChain         = "virtualmachineinstances/sev/fetchcertchain"
 	VMInstancesSEVQueryLaunchMeasurement = "virtualmachineinstances/sev/querylaunchmeasurement"
+	VMInstancesSEVSetupSession           = "virtualmachineinstances/sev/setupsession"
 )
 
 func GetAllCluster() []runtime.Object {
@@ -166,6 +167,7 @@ func newAdminClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/unfreeze",
 					"virtualmachineinstances/softreboot",
 					"virtualmachineinstances/portforward",
+					VMInstancesSEVSetupSession,
 				},
 				Verbs: []string{
 					"update",
@@ -296,6 +298,7 @@ func newEditClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/unfreeze",
 					"virtualmachineinstances/softreboot",
 					"virtualmachineinstances/portforward",
+					VMInstancesSEVSetupSession,
 				},
 				Verbs: []string{
 					"update",

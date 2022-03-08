@@ -312,6 +312,7 @@ func NewOperatorClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/unfreeze",
 					"virtualmachineinstances/softreboot",
 					"virtualmachineinstances/portforward",
+					"virtualmachineinstances/sev/setupsession",
 				},
 				Verbs: []string{
 					"update",
