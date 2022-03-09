@@ -235,6 +235,7 @@ rules:
   - virtualmachineinstances/softreboot
   - virtualmachineinstances/portforward
   - virtualmachineinstances/sev/setupsession
+  - virtualmachineinstances/sev/injectlaunchsecret
   verbs:
   - update
   - get
@@ -483,6 +484,7 @@ rules:
   - virtualmachineinstances/unfreeze
   - virtualmachineinstances/softreboot
   - virtualmachineinstances/sev/setupsession
+  - virtualmachineinstances/sev/injectlaunchsecret
   verbs:
   - update
 - apiGroups:
@@ -658,6 +660,7 @@ rules:
   - virtualmachineinstances/softreboot
   - virtualmachineinstances/portforward
   - virtualmachineinstances/sev/setupsession
+  - virtualmachineinstances/sev/injectlaunchsecret
   verbs:
   - update
 - apiGroups:
@@ -761,6 +764,7 @@ rules:
   - virtualmachineinstances/softreboot
   - virtualmachineinstances/portforward
   - virtualmachineinstances/sev/setupsession
+  - virtualmachineinstances/sev/injectlaunchsecret
   verbs:
   - update
 - apiGroups:

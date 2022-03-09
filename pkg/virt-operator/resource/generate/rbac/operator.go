@@ -313,6 +313,7 @@ func NewOperatorClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/softreboot",
 					"virtualmachineinstances/portforward",
 					"virtualmachineinstances/sev/setupsession",
+					"virtualmachineinstances/sev/injectlaunchsecret",
 				},
 				Verbs: []string{
 					"update",
