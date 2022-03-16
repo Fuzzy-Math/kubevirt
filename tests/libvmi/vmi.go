@@ -125,6 +125,14 @@ func WithSEV() Option {
 	}
 }
 
+func WithSEVAttestation() Option {
+	return func(vmi *kvirtv1.VirtualMachineInstance) {
+		startStrategy := v1.StartStrategyPaused
+		vmi.Spec.StartStrategy = &startStrategy
+		vmi.Spec.Domain.LaunchSecurity.SEV.Attestation = &v1.SEVAttestation{}
+	}
+}
+
 func baseVmi(name string) *kvirtv1.VirtualMachineInstance {
 	vmi := kvirtv1.NewVMIReferenceFromNameWithNS("", name)
 	vmi.Spec = kvirtv1.VirtualMachineInstanceSpec{Domain: kvirtv1.DomainSpec{}}
