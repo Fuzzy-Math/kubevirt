@@ -163,24 +163,30 @@ var _ = Describe("Node-labeller config", func() {
 	})
 
 	Context("return correct SEV capabilities", func() {
-		It("when SEV is supported", func() {
+		It("when SEV(ES) is supported", func() {
 			nlController.domCapabilitiesFileName = "domcapabilities_sev.xml"
 			err := nlController.loadDomCapabilities()
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(nlController.SEV.Supported).To(Equal("yes"))
-			Expect(nlController.SEV.Cbitpos).To(Equal("47"))
-			Expect(nlController.SEV.ReducedPhysBits).To(Equal("1"))
+			Expect(nlController.SEV.SupportedES).To(Equal("yes"))
+			Expect(nlController.SEV.CBitPos).To(Equal(uint(47)))
+			Expect(nlController.SEV.ReducedPhysBits).To(Equal(uint(1)))
+			Expect(nlController.SEV.MaxGuests).To(Equal(uint(15)))
+			Expect(nlController.SEV.MaxESGuests).To(Equal(uint(15)))
 		})
 
-		It("when SEV is not supported", func() {
+		It("when SEV(ES) is not supported", func() {
 			nlController.domCapabilitiesFileName = "domcapabilities_nosev.xml"
 			err := nlController.loadDomCapabilities()
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(nlController.SEV.Supported).To(Equal("no"))
-			Expect(nlController.SEV.Cbitpos).To(BeEmpty())
-			Expect(nlController.SEV.ReducedPhysBits).To(BeEmpty())
+			Expect(nlController.SEV.SupportedES).To(Equal("no"))
+			Expect(nlController.SEV.CBitPos).To(BeZero())
+			Expect(nlController.SEV.ReducedPhysBits).To(BeZero())
+			Expect(nlController.SEV.MaxGuests).To(BeZero())
+			Expect(nlController.SEV.MaxESGuests).To(BeZero())
 		})
 	})
 })

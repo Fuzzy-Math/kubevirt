@@ -58,6 +58,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 	var namespaceLimitInformer cache.SharedIndexInformer
 	var kvInformer cache.SharedIndexInformer
 	var mutator *VMIsMutator
+	var encryptedState bool
 
 	memoryLimit := "128M"
 	cpuModelFromConfig := "Haswell"
@@ -962,27 +963,106 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.CPU = &v1.CPU{Realtime: &v1.Realtime{}}
 		vmi.Spec.NodeSelector = map[string]string{v1.NodeSchedulable: "true"}
 		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
-		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true", v1.RealtimeLabel: ""}))
+		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true", v1.RealtimeLabel: "true"}))
 	})
 
-	It("should add SEV node label selector with SEV workload", func() {
-		vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{SEV: &v1.SEV{}}
-		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
-		Expect(vmiSpec.NodeSelector).NotTo(BeNil())
-		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.SEVLabel: ""}))
-	})
-
-	It("should not add SEV node label selector when no SEV workload", func() {
-		vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{}
-		vmi.Spec.NodeSelector = map[string]string{v1.NodeSchedulable: "true"}
-		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
-		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true"}))
-	})
-
-	It("should not overwrite existing node label selectors with SEV workload", func() {
-		vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{SEV: &v1.SEV{}}
-		vmi.Spec.NodeSelector = map[string]string{v1.NodeSchedulable: "true"}
-		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
-		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true", v1.SEVLabel: ""}))
-	})
+	DescribeTable("When scheduling SEV workloads",
+		func(nodeSelectorBefore map[string]string,
+			nodeSelectorAfter map[string]string,
+			launchSec *v1.LaunchSecurity, testES bool) {
+			encryptedState = testES
+			vmi.Spec.NodeSelector = nodeSelectorBefore
+			vmi.Spec.Domain.LaunchSecurity = launchSec
+			_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
+			Expect(vmiSpec.NodeSelector).NotTo(BeNil())
+			Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(nodeSelectorAfter))
+		},
+		Entry("It should add SEV node label selector with SEV workload",
+			map[string]string{},
+			map[string]string{v1.SEVLabel: "true"},
+			&v1.LaunchSecurity{SEV: &v1.SEV{}},
+			false),
+		Entry("It should not add SEV node label selector when no SEV workload",
+			map[string]string{v1.NodeSchedulable: "true"},
+			map[string]string{v1.NodeSchedulable: "true"},
+			&v1.LaunchSecurity{},
+			false),
+		Entry("It should not overwrite existing node label selectors with SEV workload",
+			map[string]string{v1.NodeSchedulable: "true"},
+			map[string]string{v1.NodeSchedulable: "true", v1.SEVLabel: "true"},
+			&v1.LaunchSecurity{SEV: &v1.SEV{}},
+			false),
+		Entry("It should add SEV and SEV-ES node label selector with SEV-ES workload",
+			map[string]string{},
+			map[string]string{
+				v1.SEVLabel:   "true",
+				v1.SEVESLabel: "true",
+			},
+			&v1.LaunchSecurity{
+				SEV: &v1.SEV{
+					Policy: &v1.SEVPolicy{
+						EncryptedState: &encryptedState,
+					},
+				},
+			},
+			// Set encryptedState to true
+			true),
+		Entry("It should not add SEV-ES node label selector when no SEV policy is set",
+			map[string]string{v1.NodeSchedulable: "true"},
+			map[string]string{
+				v1.NodeSchedulable: "true",
+				v1.SEVLabel:        "true",
+			},
+			&v1.LaunchSecurity{
+				SEV: &v1.SEV{
+					Policy: &v1.SEVPolicy{},
+				},
+			},
+			false),
+		Entry("It should not add SEV-ES node label selector when no SEV-ES policy bit is set",
+			map[string]string{v1.NodeSchedulable: "true"},
+			map[string]string{
+				v1.NodeSchedulable: "true",
+				v1.SEVLabel:        "true",
+			},
+			&v1.LaunchSecurity{
+				SEV: &v1.SEV{
+					Policy: &v1.SEVPolicy{
+						EncryptedState: nil,
+					},
+				},
+			},
+			false),
+		Entry("It should not add SEV-ES node label selector when SEV-ES policy bit is set to false",
+			map[string]string{v1.NodeSchedulable: "true"},
+			map[string]string{
+				v1.NodeSchedulable: "true",
+				v1.SEVLabel:        "true",
+			},
+			&v1.LaunchSecurity{
+				SEV: &v1.SEV{
+					Policy: &v1.SEVPolicy{
+						EncryptedState: &encryptedState,
+					},
+				},
+			},
+			// Set encryptedState to false
+			false),
+		Entry("It should not overwrite existing node label selectors with SEV-ES workload",
+			map[string]string{v1.NodeSchedulable: "true"},
+			map[string]string{
+				v1.NodeSchedulable: "true",
+				v1.SEVLabel:        "true",
+				v1.SEVESLabel:      "true",
+			},
+			&v1.LaunchSecurity{
+				SEV: &v1.SEV{
+					Policy: &v1.SEVPolicy{
+						EncryptedState: &encryptedState,
+					},
+				},
+			},
+			// Set encryptedState to true
+			true),
+	)
 })

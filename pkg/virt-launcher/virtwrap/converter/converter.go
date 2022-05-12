@@ -1291,10 +1291,8 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 		sevPolicyBits := launchsecurity.SEVPolicyToBits(vmi.Spec.Domain.LaunchSecurity.SEV.Policy)
 		// Cbitpos and ReducedPhysBits will be filled automatically by libvirt from the domain capabilities
 		domain.Spec.LaunchSecurity = &api.LaunchSecurity{
-			Type:    "sev",
-			Policy:  "0x" + strconv.FormatUint(uint64(sevPolicyBits), 16),
-			DHCert:  vmi.Spec.Domain.LaunchSecurity.SEV.DHCert,
-			Session: vmi.Spec.Domain.LaunchSecurity.SEV.Session,
+			Type:   "sev",
+			Policy: "0x" + strconv.FormatUint(uint64(sevPolicyBits), 16),
 		}
 		controllerDriver = &api.ControllerDriver{
 			IOMMU: "on",

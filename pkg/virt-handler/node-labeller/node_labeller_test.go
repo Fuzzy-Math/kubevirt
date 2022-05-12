@@ -127,19 +127,25 @@ var _ = Describe("Node-labeller ", func() {
 	})
 
 	It("should add host cpu model label", func() {
-		expectNodePatch(kubevirtv1.HostModelCPULabel)
 		res := nlController.execute()
+		expectNodePatch(kubevirtv1.HostModelCPULabel)
 		Expect(res).To(BeTrue())
 	})
 	It("should add host cpu required features", func() {
-		expectNodePatch(kubevirtv1.HostModelRequiredFeaturesLabel)
 		res := nlController.execute()
+		expectNodePatch(kubevirtv1.HostModelRequiredFeaturesLabel)
 		Expect(res).To(BeTrue())
 	})
 
 	It("should add SEV label", func() {
-		expectNodePatch(kubevirtv1.SEVLabel)
 		res := nlController.execute()
+		expectNodePatch(kubevirtv1.SEVLabel)
+		Expect(res).To(BeTrue())
+	})
+
+	It("should add SEVES label", func() {
+		res := nlController.execute()
+		expectNodePatch(kubevirtv1.SEVESLabel)
 		Expect(res).To(BeTrue())
 	})
 
