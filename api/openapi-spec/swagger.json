@@ -14747,7 +14747,37 @@
     "type": "object"
    },
    "v1.SEV": {
+    "type": "object",
+    "properties": {
+     "attestation": {
+      "description": "If specified, run the attestation process for a vmi.",
+      "$ref": "#/definitions/v1.SEVAttestation"
+     },
+     "dhCert": {
+      "description": "Base64 encoded guest owner's Diffie-Hellman key.",
+      "type": "string"
+     },
+     "policy": {
+      "description": "Guest policy flags as defined in AMD SEV API specification. Note: due to security reasons it is not allowed to enable guest debugging. Therefore NoDebug flag is not exposed to users and is always true.",
+      "$ref": "#/definitions/v1.SEVPolicy"
+     },
+     "session": {
+      "description": "Base64 encoded session blob.",
+      "type": "string"
+     }
+    }
+   },
+   "v1.SEVAttestation": {
     "type": "object"
+   },
+   "v1.SEVPolicy": {
+    "type": "object",
+    "properties": {
+     "encryptedState": {
+      "description": "SEV-ES is required. Defaults to false.",
+      "type": "boolean"
+     }
+    }
    },
    "v1.SMBiosConfiguration": {
     "type": "object",

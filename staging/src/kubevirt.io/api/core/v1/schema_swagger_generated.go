@@ -361,7 +361,22 @@ func (LaunchSecurity) SwaggerDoc() map[string]string {
 }
 
 func (SEV) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"attestation": "If specified, run the attestation process for a vmi.\n+opitonal",
+		"session":     "Base64 encoded session blob.",
+		"dhCert":      "Base64 encoded guest owner's Diffie-Hellman key.",
+		"policy":      "Guest policy flags as defined in AMD SEV API specification.\nNote: due to security reasons it is not allowed to enable guest debugging. Therefore NoDebug flag is not exposed to users and is always true.",
+	}
+}
+
+func (SEVAttestation) SwaggerDoc() map[string]string {
 	return map[string]string{}
+}
+
+func (SEVPolicy) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"encryptedState": "SEV-ES is required.\nDefaults to false.\n+optional",
+	}
 }
 
 func (LunTarget) SwaggerDoc() map[string]string {
