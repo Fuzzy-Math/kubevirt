@@ -58,6 +58,7 @@ type NodeLabeller struct {
 	cpuModelVendor          string
 	volumePath              string
 	domCapabilitiesFileName string
+	nodeSEVInfoFileName     string
 	capabilities            *api.Capabilities
 	hostCPUModel            hostCPUModel
 	SEV                     SEVConfiguration
@@ -77,6 +78,7 @@ func newNodeLabeller(clusterConfig *virtconfig.ClusterConfig, clientset kubecli.
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "virt-handler-node-labeller"),
 		volumePath:              volumePath,
 		domCapabilitiesFileName: "virsh_domcapabilities.xml",
+		nodeSEVInfoFileName:     "nodesevinfo",
 		hostCPUModel:            hostCPUModel{requiredFeatures: make(map[string]bool, 0)},
 	}
 
@@ -310,7 +312,8 @@ func (n *NodeLabeller) removeLabellerLabels(node *v1.Node) {
 			strings.Contains(label, kubevirtv1.CPUTimerLabel) ||
 			strings.Contains(label, kubevirtv1.HypervLabel) ||
 			strings.Contains(label, kubevirtv1.RealtimeLabel) ||
-			strings.Contains(label, kubevirtv1.SEVLabel) {
+			strings.Contains(label, kubevirtv1.SEVLabel) ||
+			strings.Contains(label, kubevirtv1.SEVESLabel) {
 			delete(node.Labels, label)
 		}
 	}

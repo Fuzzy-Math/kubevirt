@@ -47,6 +47,7 @@ import (
 
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device"
+	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/launchsecurity"
 
 	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/log"
@@ -69,11 +70,10 @@ type HostDeviceType string
 
 // The location of uefi boot loader on ARM64 is different from that on x86
 const (
-	defaultIOThread                 = uint(1)
-	HostDevicePCI    HostDeviceType = "pci"
-	HostDeviceMDEV   HostDeviceType = "mdev"
-	resolvConf                      = "/etc/resolv.conf"
-	SEVPolicyNoDebug                = "0x1"
+	defaultIOThread                = uint(1)
+	HostDevicePCI   HostDeviceType = "pci"
+	HostDeviceMDEV  HostDeviceType = "mdev"
+	resolvConf                     = "/etc/resolv.conf"
 )
 
 const (
@@ -1288,10 +1288,13 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 	}
 	// Set SEV launch security parameters: https://libvirt.org/formatdomain.html#launch-security
 	if c.UseLaunchSecurity {
+		sevPolicyBits := launchsecurity.SEVPolicyToBits(vmi.Spec.Domain.LaunchSecurity.SEV.Policy)
 		// Cbitpos and ReducedPhysBits will be filled automatically by libvirt from the domain capabilities
 		domain.Spec.LaunchSecurity = &api.LaunchSecurity{
-			Type:   "sev",
-			Policy: SEVPolicyNoDebug, // Always set SEV NoDebug policy
+			Type:    "sev",
+			Policy:  "0x" + strconv.FormatUint(uint64(sevPolicyBits), 16),
+			DHCert:  vmi.Spec.Domain.LaunchSecurity.SEV.DHCert,
+			Session: vmi.Spec.Domain.LaunchSecurity.SEV.Session,
 		}
 		controllerDriver = &api.ControllerDriver{
 			IOMMU: "on",

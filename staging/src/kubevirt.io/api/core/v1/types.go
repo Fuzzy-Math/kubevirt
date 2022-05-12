@@ -828,6 +828,9 @@ const (
 	// SEVLabel marks the node as capable of running workloads with SEV
 	SEVLabel string = "kubevirt.io/sev"
 
+	// SEVESLabel marks the node as capable of running workloads with SEV-ES
+	SEVESLabel string = "kubevirt.io/sev-es"
+
 	// FlavorAnnotation is the name of a VirtualMachineFlavor
 	FlavorAnnotation string = "kubevirt.io/flavor-name"
 
