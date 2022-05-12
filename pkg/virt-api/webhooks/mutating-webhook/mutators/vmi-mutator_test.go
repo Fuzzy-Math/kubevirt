@@ -950,7 +950,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.CPU = &v1.CPU{Realtime: &v1.Realtime{}}
 		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.NodeSelector).NotTo(BeNil())
-		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.RealtimeLabel: ""}))
+		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.RealtimeLabel: "true"}))
 	})
 	It("should not add realtime node label selector when no realtime workload", func() {
 		vmi.Spec.Domain.CPU = &v1.CPU{Realtime: nil}
