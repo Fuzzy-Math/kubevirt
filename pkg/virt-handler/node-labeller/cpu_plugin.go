@@ -170,6 +170,14 @@ func (n *NodeLabeller) getDomCapabilities() (HostDomCapabilities, error) {
 		hostDomCapabilities.SEV.SupportedES = "no"
 	}
 
+	hostDomCapabilities.SEV.SupportedSNP = "no"
+	for _, secType := range hostDomCapabilities.LaunchSecurity.SecTypes {
+		if secType == "sev-snp" {
+			hostDomCapabilities.SEV.SupportedSNP = "yes"
+			break
+		}
+	}
+
 	return hostDomCapabilities, err
 }
 

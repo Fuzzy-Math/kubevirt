@@ -166,11 +166,31 @@ var _ = Describe("Node-labeller config", func() {
 					Expect(nlController.SEV.MaxGuests).To(BeZero())
 					Expect(nlController.SEV.SupportedES).To(Equal("no"))
 					Expect(nlController.SEV.MaxESGuests).To(BeZero())
+					Expect(nlController.SEV.SupportedSNP).To(Equal("no"))
 				}
 			},
 			Entry("when only SEV is supported", true, false),
 			Entry("when both SEV and SEV-ES are supported", true, true),
 			Entry("when neither SEV nor SEV-ES are supported", false, false),
+		)
+
+		DescribeTable("for SEV-SNP", func(withSNP bool) {
+			if withSNP {
+				nlController.domCapabilitiesFileName = "domcapabilities_sev.xml"
+			} else {
+				nlController.domCapabilitiesFileName = "domcapabilities_nosev.xml"
+			}
+			err := nlController.loadDomCapabilities()
+			Expect(err).ToNot(HaveOccurred())
+
+			if withSNP {
+				Expect(nlController.SEV.SupportedSNP).To(Equal("yes"))
+			} else {
+				Expect(nlController.SEV.SupportedSNP).To(Equal("no"))
+			}
+		},
+			Entry("when supported", true),
+			Entry("when unsupported", false),
 		)
 	})
 

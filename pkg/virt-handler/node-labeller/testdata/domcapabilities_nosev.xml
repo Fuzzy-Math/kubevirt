@@ -218,6 +218,7 @@
     <backingStoreInput supported='yes'/>
     <backup supported='no'/>
     <sev supported='no'/>
+    <launchSecurity supported='no'/>
   </features>
 </domainCapabilities>
 
