@@ -600,6 +600,7 @@ spec:
             policy:
               encryptedState: true
             session: sessionValue
+          sevsnp: {}
         machine:
           type: typeValue
         memory:

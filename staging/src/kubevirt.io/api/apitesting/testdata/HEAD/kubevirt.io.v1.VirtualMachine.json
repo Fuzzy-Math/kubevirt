@@ -427,7 +427,8 @@
               "attestation": {},
               "session": "sessionValue",
               "dhCert": "dhCertValue"
-            }
+            },
+            "sevsnp": {}
           }
         },
         "nodeSelector": {

@@ -708,6 +708,8 @@ type DiskTarget struct {
 type LaunchSecurity struct {
 	// AMD Secure Encrypted Virtualization (SEV).
 	SEV *SEV `json:"sev,omitempty"`
+	// AMD SEV Secure Nested Paging (SNP).
+	SEVSNP *SEVSNP `json:"sevsnp,omitempty"`
 }
 
 type SEV struct {
@@ -731,6 +733,9 @@ type SEVPolicy struct {
 }
 
 type SEVAttestation struct {
+}
+
+type SEVSNP struct {
 }
 
 type LunTarget struct {

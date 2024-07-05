@@ -14770,6 +14770,10 @@
      "sev": {
       "description": "AMD Secure Encrypted Virtualization (SEV).",
       "$ref": "#/definitions/v1.SEV"
+     },
+     "sevsnp": {
+      "description": "AMD SEV Secure Nested Paging (SNP).",
+      "$ref": "#/definitions/v1.SEVSNP"
      }
     }
    },
@@ -15710,6 +15714,9 @@
       "type": "boolean"
      }
     }
+   },
+   "v1.SEVSNP": {
+    "type": "object"
    },
    "v1.SEVSecretOptions": {
     "description": "SEVSecretOptions is used to provide a secret for a running guest.",

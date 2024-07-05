@@ -6866,6 +6866,9 @@ var CRDsValidation map[string]string = map[string]string{
                               description: Base64 encoded session blob.
                               type: string
                           type: object
+                        sevsnp:
+                          description: AMD SEV Secure Nested Paging (SNP).
+                          type: object
                       type: object
                     machine:
                       description: Machine type.
@@ -8745,6 +8748,9 @@ var CRDsValidation map[string]string = map[string]string{
                 session:
                   description: Base64 encoded session blob.
                   type: string
+              type: object
+            sevsnp:
+              description: AMD SEV Secure Nested Paging (SNP).
               type: object
           type: object
         memory:
@@ -11916,6 +11922,9 @@ var CRDsValidation map[string]string = map[string]string{
                       description: Base64 encoded session blob.
                       type: string
                   type: object
+                sevsnp:
+                  description: AMD SEV Secure Nested Paging (SNP).
+                  type: object
               type: object
             machine:
               description: Machine type.
@@ -15057,6 +15066,9 @@ var CRDsValidation map[string]string = map[string]string{
                       description: Base64 encoded session blob.
                       type: string
                   type: object
+                sevsnp:
+                  description: AMD SEV Secure Nested Paging (SNP).
+                  type: object
               type: object
             machine:
               description: Machine type.
@@ -17471,6 +17483,9 @@ var CRDsValidation map[string]string = map[string]string{
                               description: Base64 encoded session blob.
                               type: string
                           type: object
+                        sevsnp:
+                          description: AMD SEV Secure Nested Paging (SNP).
+                          type: object
                       type: object
                     machine:
                       description: Machine type.
@@ -18814,6 +18829,9 @@ var CRDsValidation map[string]string = map[string]string{
                 session:
                   description: Base64 encoded session blob.
                   type: string
+              type: object
+            sevsnp:
+              description: AMD SEV Secure Nested Paging (SNP).
               type: object
           type: object
         memory:
@@ -21971,6 +21989,9 @@ var CRDsValidation map[string]string = map[string]string{
                                     session:
                                       description: Base64 encoded session blob.
                                       type: string
+                                  type: object
+                                sevsnp:
+                                  description: AMD SEV Secure Nested Paging (SNP).
                                   type: object
                               type: object
                             machine:
@@ -27142,6 +27163,9 @@ var CRDsValidation map[string]string = map[string]string{
                                         session:
                                           description: Base64 encoded session blob.
                                           type: string
+                                      type: object
+                                    sevsnp:
+                                      description: AMD SEV Secure Nested Paging (SNP).
                                       type: object
                                   type: object
                                 machine:

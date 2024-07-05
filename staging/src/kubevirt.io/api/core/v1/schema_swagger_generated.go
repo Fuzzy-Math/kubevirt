@@ -385,7 +385,8 @@ func (DiskTarget) SwaggerDoc() map[string]string {
 
 func (LaunchSecurity) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"sev": "AMD Secure Encrypted Virtualization (SEV).",
+		"sev":    "AMD Secure Encrypted Virtualization (SEV).",
+		"sevsnp": "AMD SEV Secure Nested Paging (SNP).",
 	}
 }
 
@@ -405,6 +406,10 @@ func (SEVPolicy) SwaggerDoc() map[string]string {
 }
 
 func (SEVAttestation) SwaggerDoc() map[string]string {
+	return map[string]string{}
+}
+
+func (SEVSNP) SwaggerDoc() map[string]string {
 	return map[string]string{}
 }
 
