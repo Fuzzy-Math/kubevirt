@@ -647,6 +647,25 @@ var _ = Describe("GetMemoryOverhead calculation", func() {
 		})
 	})
 
+	When("the vmi requests AMD SEV-SNP", func() {
+		BeforeEach(func() {
+			vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{
+				SEVSNP: &v1.SEVSNP{},
+			}
+		})
+
+		It("should add SEV overhead", func() {
+			expected := resource.NewScaledQuantity(0, resource.Kilo)
+			expected.Add(*baseOverhead)
+			expected.Add(*staticOverhead)
+			expected.Add(*videoRAMOverhead)
+			expected.Add(*coresOverhead)
+			expected.Add(*sevOverhead)
+			overhead := GetMemoryOverhead(vmi, "amd64", nil)
+			Expect(overhead.Value()).To(BeEquivalentTo(expected.Value()))
+		})
+	})
+
 	When("the vmi requests TPM device", func() {
 		BeforeEach(func() {
 			vmi.Spec.Domain.Devices = v1.Devices{
@@ -654,7 +673,7 @@ var _ = Describe("GetMemoryOverhead calculation", func() {
 			}
 		})
 
-		It("should add SEV overhead", func() {
+		It("should add TPM overhead", func() {
 			expected := resource.NewScaledQuantity(0, resource.Kilo)
 			expected.Add(*baseOverhead)
 			expected.Add(*staticOverhead)

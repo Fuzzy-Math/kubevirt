@@ -1471,7 +1471,9 @@ func (t *templateService) VMIResourcePredicates(vmi *v1.VirtualMachineInstance, 
 			}, WithNetworkResources(networkToResourceMap)),
 			NewVMIResourceRule(util.IsGPUVMI, WithGPUs(vmi.Spec.Domain.Devices.GPUs)),
 			NewVMIResourceRule(util.IsHostDevVMI, WithHostDevices(vmi.Spec.Domain.Devices.HostDevices)),
-			NewVMIResourceRule(util.IsSEVVMI, WithSEV()),
+			NewVMIResourceRule(func(vmi *v1.VirtualMachineInstance) bool {
+				return util.IsSEVVMI(vmi) || util.IsSEVSNPVMI(vmi)
+			}, WithSEV()),
 			NewVMIResourceRule(reservation.HasVMIPersistentReservation, WithPersistentReservation()),
 		},
 	}

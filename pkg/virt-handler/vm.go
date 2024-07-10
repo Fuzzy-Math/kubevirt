@@ -3070,7 +3070,7 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 			return fmt.Errorf("preparing host-disks failed: %v", err)
 		}
 
-		if virtutil.IsSEVVMI(vmi) {
+		if virtutil.IsSEVVMI(vmi) || virtutil.IsSEVSNPVMI(vmi) {
 			sevDevice, err := safepath.JoinNoFollow(virtLauncherRootMount, filepath.Join("dev", "sev"))
 			if err != nil {
 				return err
