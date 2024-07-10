@@ -82,7 +82,7 @@ var _ = Describe("EFI environment detection", func() {
 	)
 
 	It("SEV EFI Roms", func() {
-		ovmfPath := createEFIRoms(EFICodeSEV, EFIVarsSEV)
+		ovmfPath := createEFIRoms(EFICodeSEV)
 		defer os.RemoveAll(ovmfPath)
 
 		efiEnv := DetectEFIEnvironment("x86_64", ovmfPath)
@@ -98,11 +98,5 @@ var _ = Describe("EFI environment detection", func() {
 		Expect(efiEnv.EFICode(secureBootEnabled, !sevEnabled)).ToNot(Equal(codeSEV))
 		Expect(efiEnv.EFICode(!secureBootEnabled, sevEnabled)).To(Equal(codeSEV))
 		Expect(efiEnv.EFICode(!secureBootEnabled, !sevEnabled)).ToNot(Equal(codeSEV))
-
-		varsSEV := filepath.Join(ovmfPath, EFIVarsSEV)
-		Expect(efiEnv.EFIVars(secureBootEnabled, sevEnabled)).ToNot(Equal(varsSEV))
-		Expect(efiEnv.EFIVars(secureBootEnabled, !sevEnabled)).ToNot(Equal(varsSEV))
-		Expect(efiEnv.EFIVars(!secureBootEnabled, sevEnabled)).To(Equal(varsSEV))
-		Expect(efiEnv.EFIVars(!secureBootEnabled, !sevEnabled)).To(Equal(varsSEV)) // same as EFIVars
 	})
 })

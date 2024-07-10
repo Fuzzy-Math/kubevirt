@@ -1224,6 +1224,12 @@ func Convert_v1_Firmware_To_related_apis(vmi *v1.VirtualMachineInstance, domain 
 			Template: c.EFIConfiguration.EFIVars,
 			NVRam:    filepath.Join(services.PathForNVram(vmi), vmi.Name+"_VARS.fd"),
 		}
+
+		if util.IsSEVVMI(vmi) || util.IsSEVSNPVMI(vmi) {
+			// Use stateless firmware for SEV VMs
+			domain.Spec.OS.BootLoader.Type = "rom"
+			domain.Spec.OS.NVRam = nil
+		}
 	}
 
 	if firmware.Bootloader != nil && firmware.Bootloader.BIOS != nil {
@@ -1358,13 +1364,22 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 
 	// Set SEV launch security parameters: https://libvirt.org/formatdomain.html#launch-security
 	if c.UseLaunchSecurity {
-		sevPolicyBits := launchsecurity.SEVPolicyToBits(vmi.Spec.Domain.LaunchSecurity.SEV.Policy)
-		// Cbitpos and ReducedPhysBits will be filled automatically by libvirt from the domain capabilities
-		domain.Spec.LaunchSecurity = &api.LaunchSecurity{
-			Type:    "sev",
-			Policy:  "0x" + strconv.FormatUint(uint64(sevPolicyBits), 16),
-			DHCert:  vmi.Spec.Domain.LaunchSecurity.SEV.DHCert,
-			Session: vmi.Spec.Domain.LaunchSecurity.SEV.Session,
+		switch {
+		case util.IsSEVVMI(vmi):
+			sevPolicyBits := launchsecurity.SEVPolicyToBits(vmi.Spec.Domain.LaunchSecurity.SEV.Policy)
+			// Cbitpos and ReducedPhysBits will be filled automatically by libvirt from the domain capabilities
+			domain.Spec.LaunchSecurity = &api.LaunchSecurity{
+				Type:    "sev",
+				Policy:  "0x" + strconv.FormatUint(uint64(sevPolicyBits), 16),
+				DHCert:  vmi.Spec.Domain.LaunchSecurity.SEV.DHCert,
+				Session: vmi.Spec.Domain.LaunchSecurity.SEV.Session,
+			}
+		case util.IsSEVSNPVMI(vmi):
+			domain.Spec.LaunchSecurity = &api.LaunchSecurity{
+				Type: "sev-snp",
+				// Default QEMU policy: no minimum ABI major/minor version is required and SMT is allowed.
+				Policy: "0x30000",
+			}
 		}
 		controllerDriver = &api.ControllerDriver{
 			IOMMU: "on",
