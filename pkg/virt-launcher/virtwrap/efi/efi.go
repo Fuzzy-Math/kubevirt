@@ -31,8 +31,7 @@ const (
 	EFIVarsAARCH64    = "AAVMF_VARS.fd"
 	EFICodeSecureBoot = "OVMF_CODE.secboot.fd"
 	EFIVarsSecureBoot = "OVMF_VARS.secboot.fd"
-	EFICodeSEV        = "OVMF_CODE.cc.fd"
-	EFIVarsSEV        = EFIVars
+	EFICodeSEV        = "OVMF.amdsev.fd"
 )
 
 type EFIEnvironment struct {
@@ -41,14 +40,13 @@ type EFIEnvironment struct {
 	codeSecureBoot string
 	varsSecureBoot string
 	codeSEV        string
-	varsSEV        string
 }
 
 func (e *EFIEnvironment) Bootable(secureBoot, sev bool) bool {
 	if secureBoot {
 		return e.varsSecureBoot != "" && e.codeSecureBoot != ""
 	} else if sev {
-		return e.varsSEV != "" && e.codeSEV != ""
+		return e.codeSEV != ""
 	} else {
 		return e.vars != "" && e.code != ""
 	}
@@ -68,7 +66,8 @@ func (e *EFIEnvironment) EFIVars(secureBoot, sev bool) string {
 	if secureBoot {
 		return e.varsSecureBoot
 	} else if sev {
-		return e.varsSEV
+		// SEV uses stateless firmware
+		return ""
 	} else {
 		return e.vars
 	}
@@ -100,7 +99,6 @@ func DetectEFIEnvironment(arch, ovmfPath string) *EFIEnvironment {
 
 	// detect EFI with SEV
 	codeWithSEV := getEFIBinaryIfExists(ovmfPath, EFICodeSEV)
-	varsWithSEV := getEFIBinaryIfExists(ovmfPath, EFIVarsSEV)
 
 	return &EFIEnvironment{
 		codeSecureBoot: codeWithSB,
@@ -108,7 +106,6 @@ func DetectEFIEnvironment(arch, ovmfPath string) *EFIEnvironment {
 		code:           code,
 		vars:           vars,
 		codeSEV:        codeWithSEV,
-		varsSEV:        varsWithSEV,
 	}
 }
 
