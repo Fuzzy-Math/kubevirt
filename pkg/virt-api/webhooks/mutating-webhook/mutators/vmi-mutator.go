@@ -97,6 +97,10 @@ func (mutator *VMIsMutator) Mutate(ar *admissionv1.AdmissionReview) *admissionv1
 			log.Log.V(4).Info("Add SEV-ES node label selector")
 			addNodeSelector(newVMI, v1.SEVESLabel)
 		}
+		if util.IsSEVSNPVMI(newVMI) {
+			log.Log.V(4).Info("Add SEV-SNP node label selector")
+			addNodeSelector(newVMI, v1.SEVSNPLabel)
+		}
 
 		if newVMI.Spec.Domain.CPU.IsolateEmulatorThread {
 			_, emulatorThreadCompleteToEvenParityAnnotationExists := mutator.ClusterConfig.GetConfigFromKubeVirtCR().Annotations[v1.EmulatorThreadCompleteToEvenParity]

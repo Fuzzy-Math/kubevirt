@@ -1236,6 +1236,14 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 					},
 				},
 			}),
+		Entry("It should add SEV SNP node label selector with SEV-SNP workload",
+			map[string]string{},
+			map[string]string{v1.SEVSNPLabel: ""},
+			&v1.LaunchSecurity{SEVSNP: &v1.SEVSNP{}}),
+		Entry("It should not overwrite existing node label selectors with SEV-SNP workload",
+			map[string]string{v1.NodeSchedulable: "true"},
+			map[string]string{v1.NodeSchedulable: "true", v1.SEVSNPLabel: ""},
+			&v1.LaunchSecurity{SEVSNP: &v1.SEVSNP{}}),
 	)
 
 	DescribeTable("evictionStrategy should match the", func(f func(*v1.VirtualMachineInstanceSpec) v1.EvictionStrategy) {
