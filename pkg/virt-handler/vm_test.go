@@ -2648,18 +2648,19 @@ var _ = Describe("VirtualMachineInstance", func() {
 			})
 		})
 
-		It("should not be allowed to live-migrate if the VMI uses SEV", func() {
+		DescribeTable("should not be allowed to live-migrate if the VMI uses", func(launchSecurity *v1.LaunchSecurity, reason string) {
 			vmi := api2.NewMinimalVMI("testvmi")
-			vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{
-				SEV: &v1.SEV{},
-			}
+			vmi.Spec.Domain.LaunchSecurity = launchSecurity
 
 			condition, isBlockMigration := controller.calculateLiveMigrationCondition(vmi)
 			Expect(isBlockMigration).To(BeFalse())
 			Expect(condition.Type).To(Equal(v1.VirtualMachineInstanceIsMigratable))
 			Expect(condition.Status).To(Equal(k8sv1.ConditionFalse))
-			Expect(condition.Reason).To(Equal(v1.VirtualMachineInstanceReasonSEVNotMigratable))
-		})
+			Expect(condition.Reason).To(Equal(reason))
+		},
+			Entry("SEV", &v1.LaunchSecurity{SEV: &v1.SEV{}}, v1.VirtualMachineInstanceReasonSEVNotMigratable),
+			Entry("SEV-SNP", &v1.LaunchSecurity{SEVSNP: &v1.SEVSNP{}}, v1.VirtualMachineInstanceReasonSEVSNPNotMigratable),
+		)
 
 		It("should not be allowed to live-migrate if the VMI uses SCSI persistent reservation", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
