@@ -496,48 +496,73 @@ func validateSoundDevices(field *k8sfield.Path, spec *v1.VirtualMachineInstanceS
 
 func validateLaunchSecurity(field *k8sfield.Path, spec *v1.VirtualMachineInstanceSpec, config *virtconfig.ClusterConfig) []metav1.StatusCause {
 	var causes []metav1.StatusCause
-	launchSecurity := spec.Domain.LaunchSecurity
-	if launchSecurity != nil && !config.WorkloadEncryptionSEVEnabled() {
+
+	if spec.Domain.LaunchSecurity == nil {
+		return causes
+	}
+
+	field = field.Child("domain", "launchSecurity")
+
+	if !config.WorkloadEncryptionSEVEnabled() {
 		causes = append(causes, metav1.StatusCause{
 			Type:    metav1.CauseTypeFieldValueInvalid,
 			Message: fmt.Sprintf("%s feature gate is not enabled in kubevirt-config", virtconfig.WorkloadEncryptionSEV),
-			Field:   field.Child("launchSecurity").String(),
+			Field:   field.String(),
 		})
-	} else if launchSecurity != nil && launchSecurity.SEV != nil {
-		firmware := spec.Domain.Firmware
-		if firmware == nil || firmware.Bootloader == nil || firmware.Bootloader.EFI == nil {
+	}
+
+	secTypeCount := 0
+	if spec.Domain.LaunchSecurity.SEV != nil {
+		secTypeCount++
+	}
+	if spec.Domain.LaunchSecurity.SEVSNP != nil {
+		secTypeCount++
+	}
+	if secTypeCount != 1 {
+		causes = append(causes, metav1.StatusCause{
+			Type:    metav1.CauseTypeFieldValueInvalid,
+			Message: fmt.Sprintf("%s must have exactly one type set", field.String()),
+			Field:   field.String(),
+		})
+	}
+
+	firmware := spec.Domain.Firmware
+	if firmware == nil || firmware.Bootloader == nil || firmware.Bootloader.EFI == nil {
+		causes = append(causes, metav1.StatusCause{
+			Type:    metav1.CauseTypeFieldValueInvalid,
+			Message: "SEV requires OVMF (UEFI)",
+			Field:   field.String(),
+		})
+	} else if firmware.Bootloader.EFI.SecureBoot == nil || *firmware.Bootloader.EFI.SecureBoot {
+		causes = append(causes, metav1.StatusCause{
+			Type:    metav1.CauseTypeFieldValueInvalid,
+			Message: "SEV does not work along with SecureBoot",
+			Field:   field.String(),
+		})
+	}
+
+	for _, iface := range spec.Domain.Devices.Interfaces {
+		if iface.BootOrder != nil {
 			causes = append(causes, metav1.StatusCause{
 				Type:    metav1.CauseTypeFieldValueInvalid,
-				Message: "SEV requires OVMF (UEFI)",
-				Field:   field.Child("launchSecurity").String(),
-			})
-		} else if firmware.Bootloader.EFI.SecureBoot == nil || *firmware.Bootloader.EFI.SecureBoot {
-			causes = append(causes, metav1.StatusCause{
-				Type:    metav1.CauseTypeFieldValueInvalid,
-				Message: "SEV does not work along with SecureBoot",
-				Field:   field.Child("launchSecurity").String(),
+				Message: fmt.Sprintf("SEV does not work with bootable NICs: %s", iface.Name),
+				Field:   field.String(),
 			})
 		}
+	}
 
+	if spec.Domain.LaunchSecurity.SEV != nil {
+		attestation := spec.Domain.LaunchSecurity.SEV.Attestation
 		startStrategy := spec.StartStrategy
-		if launchSecurity.SEV.Attestation != nil && (startStrategy == nil || *startStrategy != v1.StartStrategyPaused) {
+		if attestation != nil && (startStrategy == nil || *startStrategy != v1.StartStrategyPaused) {
 			causes = append(causes, metav1.StatusCause{
 				Type:    metav1.CauseTypeFieldValueInvalid,
 				Message: fmt.Sprintf("SEV attestation requires VMI StartStrategy '%s'", v1.StartStrategyPaused),
 				Field:   field.Child("launchSecurity").String(),
 			})
 		}
-
-		for _, iface := range spec.Domain.Devices.Interfaces {
-			if iface.BootOrder != nil {
-				causes = append(causes, metav1.StatusCause{
-					Type:    metav1.CauseTypeFieldValueInvalid,
-					Message: fmt.Sprintf("SEV does not work with bootable NICs: %s", iface.Name),
-					Field:   field.Child("launchSecurity").String(),
-				})
-			}
-		}
 	}
+
 	return causes
 }
 

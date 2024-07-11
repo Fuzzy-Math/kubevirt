@@ -2999,6 +2999,11 @@ var _ = Describe("Validating VMICreate Admitter", func() {
 		It("should accept when the feature gate is enabled and OVMF is configured", func() {
 			causes := ValidateVirtualMachineInstanceSpec(k8sfield.NewPath("fake"), &vmi.Spec, config)
 			Expect(causes).To(BeEmpty())
+			vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{
+				SEVSNP: &v1.SEVSNP{},
+			}
+			causes = ValidateVirtualMachineInstanceSpec(k8sfield.NewPath("fake"), &vmi.Spec, config)
+			Expect(causes).To(BeEmpty())
 		})
 
 		It("should reject when the feature gate is disabled", func() {
@@ -3006,6 +3011,20 @@ var _ = Describe("Validating VMICreate Admitter", func() {
 			causes := ValidateVirtualMachineInstanceSpec(k8sfield.NewPath("fake"), &vmi.Spec, config)
 			Expect(causes).To(HaveLen(1))
 			Expect(causes[0].Message).To(ContainSubstring(fmt.Sprintf("%s feature gate is not enabled", virtconfig.WorkloadEncryptionSEV)))
+		})
+
+		It("should reject when both SEV and SEVSNP are configured", func() {
+			vmi.Spec.Domain.LaunchSecurity.SEVSNP = &v1.SEVSNP{}
+			causes := ValidateVirtualMachineInstanceSpec(k8sfield.NewPath("fake"), &vmi.Spec, config)
+			Expect(causes).To(HaveLen(1))
+			Expect(causes[0].Message).To(ContainSubstring("must have exactly one type set"))
+		})
+
+		It("should reject when no launch security type is configured", func() {
+			vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{}
+			causes := ValidateVirtualMachineInstanceSpec(k8sfield.NewPath("fake"), &vmi.Spec, config)
+			Expect(causes).To(HaveLen(1))
+			Expect(causes[0].Message).To(ContainSubstring("must have exactly one type set"))
 		})
 
 		It("should reject when UEFI is not configured", func() {
